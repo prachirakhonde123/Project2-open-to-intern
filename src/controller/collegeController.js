@@ -9,7 +9,7 @@ const internModel = require('../model/internModel')
 
 const createCollege = async function(req, res){
     try{
-
+        
         let collegeData = req.body
         const nameRegex = /^[a-z]+$/
         const fullnameRegex = /^[a-zA-Z\s]+$/
@@ -67,6 +67,7 @@ const createCollege = async function(req, res){
 
 const getList = async function(req,res){
     try{
+        res.setHeader('Access.Control.Allow.Origin','*')
         let data = req.query
         
         //______________________________________ query is not given ____________________________________________________
