@@ -66,8 +66,9 @@ const createCollege = async function(req, res){
 
 
 const getList = async function(req,res){
+    res.setHeader('Access-Control-Allow-Origin','*')
     try{
-        res.setHeader('Access.Control.Allow.Origin','*')
+        
         let data = req.query
         
         //______________________________________ query is not given ____________________________________________________

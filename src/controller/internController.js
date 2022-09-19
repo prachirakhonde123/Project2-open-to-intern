@@ -7,8 +7,8 @@ const collegeModel = require("../model/collegeModel")
 
 
 const createIntern = async function(req,res){
+    res.setHeader('Access-Control-Allow-Origin','*')
     try{
-        res.setHeader('Access.Control.Allow.Origin','*')
         let data = req.body
         let collegeName = data.collegeName
         
