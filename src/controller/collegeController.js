@@ -1,5 +1,12 @@
 const collegeModel = require('../model/collegeModel')
 const internModel = require('../model/internModel')
+const validUrl = require('valid-url')
+
+const isValid = function (value) {
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'string' && value.trim().length === 0) return false
+    return true
+}
 
 
 
@@ -13,11 +20,14 @@ const createCollege = async function(req, res){
         let collegeData = req.body
         const nameRegex = /^[a-z]+$/
         const fullnameRegex = /^[a-zA-Z\s]+$/
-        const logolinkRegex = /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
+        
         
         //________________________________validation for college name__________________________________________
 
         if(!collegeData.name) return res.status(400).send({status : false, message : "College name is mandatory"})
+
+        if(!isValid(collegeData.name)) return res.status(400).send({status : false, message : "College name is in Invalid Format"})
+
 
         if (!collegeData.name.match(nameRegex)) return res.status(400).send({status:false, message: "name should be in lowercase"})  
         
@@ -30,14 +40,23 @@ const createCollege = async function(req, res){
         //_______________________________ validation for fullname _______________________________________________________
 
         if(!collegeData.fullName) return res.status(400).send({status : false, message : "Please provide full name of College"})
+
+        if(!isValid(collegeData.fullName)) return res.status(400).send({status : false, message : "College fullname is in Invalid Format"})
       
         if (!collegeData.fullName.match(fullnameRegex)) return res.status(400).send({status:false,msg: "College name must be contains letters only"})  
+
+        let findclg = await collegeModel.findOne({fullName : collegeData.fullName})
+        if(findclg) return res.status(400).send({status:false,msg: "College Already Exist"})
          
         //________________________________________ validation for logoLink _________________________________________________
 
-        if(!collegeData.logoLink) return res.status(400).send({status : false, message : "Please provide Logolink"})
+        if(!isValid(collegeData.logoLink)) return res.status(400).send({status : false, message : "Please provide Logolink"})
 
-        if (!collegeData.logoLink.match(logolinkRegex)) return res.status(400).send({ status:false , message: "logolink is invalid"})  
+        if (!validUrl.isUri(collegeData.logoLink)){
+            return res.status(400).send({ status: false, msg: 'URL is not valid' })
+        }
+
+         
 
         //_________________________________ College is created ________________________________________________
 
@@ -74,6 +93,10 @@ const getList = async function(req,res){
         //______________________________________ query is not given ____________________________________________________
 
         if(Object.keys(data).length == 0) return res.status(400).send({status : false, message : "Query can't be empty.Please provide College Name"})
+
+        if(Object.keys(data).length > 1){
+            return res.status(400).send({status: false, msg: 'User only allow to give input collegeName in query params'})
+       }
 
         //________________________________________ contains query __________________________________________________________
 
@@ -114,8 +137,9 @@ const getList = async function(req,res){
                 name : name,
                 fullName : fullName,
                 logoLink : logoLink,
+                message : "No intern has applied to this college"
             }
-            return res.status(200).send({status : true, data : clgObj, message : "No intern has applied to this college"})
+            return res.status(200).send({status : true, data : clgObj})
         } 
         
         //______________________________________  Intern found ___________________________________________________

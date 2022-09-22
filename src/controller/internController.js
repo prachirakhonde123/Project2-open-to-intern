@@ -1,7 +1,11 @@
 const internModel = require("../model/internModel")
 const collegeModel = require("../model/collegeModel")
 
-
+const isValid = function (value) {
+    if (typeof value === 'undefined' || value === null) return false
+    if (typeof value === 'string' && value.trim().length === 0) return false
+    return true
+}
 
 //____________________________________________ Create Intern __________________________________________________________//
 
@@ -23,6 +27,8 @@ const createIntern = async function(req,res){
 
         if(!data.name) return res.status(400).send({status : false, message : "Name is Mandatory"})
 
+        if(!isValid(data.name)) return res.status(400).send({status : false, message : "Name is in Invalid Format"})
+
         if(!data.name.match(nameRegex)) return res.status(400).send({status : false, message : "Invalid format of Name"})
         
         let finduser = await internModel.findOne({name : data.name})
@@ -31,6 +37,8 @@ const createIntern = async function(req,res){
         //_______________________________________validation for college name______________________________________
 
         if(!collegeName) return res.status(400).send({status : false, message : "College Name is mandatory"})
+
+        if(!isValid(data.collegeName)) return res.status(400).send({status : false, message : "CollegeName is in Invalid Format"})
         
         //_________________________________________validation for mobile__________________________________________
 
@@ -60,7 +68,8 @@ const createIntern = async function(req,res){
             return res.status(404).send({status : false, message : "No such a College"})
         }
         
-        let CollegeId = findCollege._id.toString()
+        let CollegeId = findCollege._id
+
         data.collegeId = CollegeId // added college Id in DB // collegeId is the key which we insert for our requirement
         //CollegeId is the id of findCollege
 
